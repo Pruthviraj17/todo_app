@@ -11,7 +11,25 @@ class TodoItemsNotifier extends StateNotifier<List<TodoItem>> {
           TodoItem(
               title: "Learn Flutter",
               description:
-                  "Learn flutter riverpod concept and make a awesome project with it"),
+                  "Learn flutter riverpod concept and make awesome projects with it, build todo app with full functionality such as local database, state management"),
+          // TodoItem(title: "Gym", description: "Go to gym at 5 pm"),
+          // TodoItem(title: "Code", description: "Code at least 6 hours today"),
+          // TodoItem(
+          //     title: "Learn Flutter",
+          //     description:
+          //         "Learn flutter riverpod concept and make awesome projects with it, build todo app with full functionality such as local database, state management"),
+          // TodoItem(title: "Gym", description: "Go to gym at 5 pm"),
+          // TodoItem(title: "Code", description: "Code at least 6 hours today"),
+          // TodoItem(
+          //     title: "Learn Flutter",
+          //     description:
+          //         "Learn flutter riverpod concept and make awesome projects with it, build todo app with full functionality such as local database, state management"),
+          // TodoItem(title: "Gym", description: "Go to gym at 5 pm"),
+          // TodoItem(title: "Code", description: "Code at least 6 hours today"),
+          // TodoItem(
+          //     title: "Learn Flutter",
+          //     description:
+          //         "Learn flutter riverpod concept and make awesome projects with it, build todo app with full functionality such as local database, state management"),
         ]);
 
   final Ref ref;

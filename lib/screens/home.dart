@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_app/providers/isdone_todo_items_provider.dart';
 import 'package:todo_app/providers/todo_item_provider.dart';
 import 'package:todo_app/widgets/add_item.dart';
+import 'package:todo_app/widgets/alert_dialog.dart';
 import 'package:todo_app/widgets/show_item_details.dart';
+import 'package:todo_app/widgets/text_widget1.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -23,10 +25,103 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void removeItems() {
+    ref.read(checkedTodoItemProvider.notifier).removeAllItems();
+  }
+
+  void deleteAllCheckedList() {
+    showAlertDialog(
+        context: context,
+        onTap: removeItems,
+        titile: "REMOVE ALL",
+        content: "Do you really want to delete all the checked list?");
+  }
+
+  Widget? divider({
+    required int todoItemsLength,
+    required int index,
+  }) {
+    if (todoItemsLength == index)
+      return Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "Completed",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Icon(
+                      Icons.arrow_drop_down_sharp,
+                      color: Colors.green,
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () => deleteAllCheckedList(),
+                  icon: Icon(
+                    Icons.delete,
+                    size: 30,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(
+              thickness: 0.1,
+            ),
+          ],
+        ),
+      );
+
+    return null;
+  }
+
+  Widget? sorryWidget({required int todoItemsLength, required int index}) {
+    if (todoItemsLength == index)
+      return Expanded(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 100,
+                child: Image.asset('assets/images/sorry.png'),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              Text(
+                "No items in the list",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onBackground,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final todoItems = ref.watch(todoItemsProvider);
     final checkedTodoItems = ref.watch(checkedTodoItemProvider);
+    final todoItemsLength = todoItems.length;
+    final checkedTodoItemsLength = checkedTodoItems.length;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -51,13 +146,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     SizedBox(
                       height: 100,
-                      child: Image.asset('assets/images/sorry.png'),
+                      child: Image.asset('assets/images/nice.png'),
                     ),
                     const SizedBox(
                       height: 16,
                     ),
                     Text(
-                      "No items in the list",
+                      "Add more todos!",
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onBackground,
                         fontWeight: FontWeight.bold,
@@ -68,134 +163,76 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-          if (todoItems.isNotEmpty)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: todoItems.length,
-                  itemBuilder: (context, index) {
-                    final todoItem = todoItems[index];
-                    return GestureDetector(
-                      onTap: () => openTodoItemModal(
-                        ShowItemDetails(
-                            itemIndex: index, todoScreen: "UncheckedList"),
-                      ),
-                      child: Card(
-                        color: Theme.of(context).colorScheme.primary,
-                        // elevation: 0,
-                        child: ListTile(
-                          leading: Text(
-                            "${index + 1}",
-                            style: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18),
-                          ),
-                          title: Text(
-                            todoItem.title,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onBackground,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          trailing: Checkbox(
-                            checkColor: Colors.white,
-                            // fillColor: MaterialStatePropertyAll(Colors.green),
-                            activeColor: Colors.green,
-                            value: todoItem.isDone,
-                            onChanged: (value) {
-                              // todoItem.isDone = value!;
-                              ref
-                                  .read(todoItemsProvider.notifier)
-                                  .isChecked(todoItem, value!);
-                            },
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          if (checkedTodoItems.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Completed",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onBackground,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const Icon(
-                        Icons.arrow_drop_down_sharp,
-                        color: Colors.green,
-                      )
-                    ],
-                  ),
-                  const Divider(
-                    thickness: 0.1,
-                  ),
-                ],
-              ),
-            ),
           Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: checkedTodoItems.length,
-              itemBuilder: (context, index) {
-                final todoItem = checkedTodoItems[index];
-                return GestureDetector(
-                  onTap: () => openTodoItemModal(
-                    ShowItemDetails(
-                        itemIndex: index, todoScreen: "CheckedList"),
-                  ),
-                  child: Card(
-                    color: Theme.of(context).colorScheme.primary,
-                    // elevation: 0,
-                    child: ListTile(
-                      leading: Text(
-                        "${index + 1}",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onBackground,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                      title: Text(
-                        todoItem.title,
-                        style: TextStyle(
-                          decoration: TextDecoration.lineThrough,
-                          color: Theme.of(context).colorScheme.onBackground,
-                          fontWeight: FontWeight.w500,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 0),
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                itemCount: todoItemsLength +
+                    (checkedTodoItems.isNotEmpty
+                        ? (checkedTodoItemsLength + 1)
+                        : checkedTodoItemsLength),
+                itemBuilder: (context, index) {
+                  final todoItem = index < todoItemsLength
+                      ? todoItems[todoItemsLength - index - 1]
+                      : checkedTodoItems[index -
+                          todoItemsLength -
+                          (index > todoItemsLength ? 1 : 0)];
+
+                  int indx = todoItemsLength > index
+                      ? (index + 1).toInt()
+                      : (index - todoItemsLength).toInt();
+
+                  return divider(
+                          todoItemsLength: todoItemsLength, index: index) ??
+                      GestureDetector(
+                        onTap: () => openTodoItemModal(
+                          ShowItemDetails(
+                              itemIndex: todoItemsLength > index
+                                  ? index
+                                  : index - todoItemsLength - 1,
+                              todoScreen: todoItemsLength > index
+                                  ? "UncheckedList"
+                                  : "CheckedList"),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      trailing: Checkbox(
-                        checkColor: Colors.white,
-                        // fillColor: MaterialStatePropertyAll(Colors.green),
-                        activeColor: Colors.green,
-                        value: todoItem.isDone,
-                        onChanged: (value) {
-                          // todoItem.isDone = value!;
-                          ref
-                              .read(checkedTodoItemProvider.notifier)
-                              .isChecked(todoItem, value!);
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              },
+                        child: Card(
+                          color: Theme.of(context).colorScheme.primary,
+                          child: ListTile(
+                            leading: TextWidget(
+                              title: (indx.toString()),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            title: TextWidget(
+                              title: todoItem.title,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              lineThrough:
+                                  todoItemsLength > index ? false : true,
+                            ),
+                            trailing: Checkbox(
+                              checkColor: Colors.white,
+                              // fillColor: MaterialStatePropertyAll(Colors.green),
+                              activeColor: Colors.green,
+                              value: todoItem.isDone,
+                              onChanged: (value) {
+                                // todoItem.isDone = value!;
+                                if (index < todoItemsLength) {
+                                  ref
+                                      .read(todoItemsProvider.notifier)
+                                      .isChecked(todoItem, value!);
+                                } else {
+                                  ref
+                                      .read(checkedTodoItemProvider.notifier)
+                                      .isChecked(todoItem, value!);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                },
+              ),
             ),
           ),
           Padding(

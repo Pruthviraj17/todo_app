@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_app/providers/isdone_todo_items_provider.dart';
 import 'package:todo_app/providers/todo_item_provider.dart';
+import 'package:todo_app/widgets/text_widget1.dart';
 
 class ShowItemDetails extends ConsumerWidget {
   const ShowItemDetails({
@@ -38,45 +39,24 @@ class ShowItemDetails extends ConsumerWidget {
           const SizedBox(
             height: 31,
           ),
-          Text(
-            "Title".toUpperCase(),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onBackground,
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
-            ),
-            textAlign: TextAlign.center,
+          TextWidget(
+            title: "TITLE",
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
           ),
-          Text(
-            todoItem.title,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onBackground,
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          TextWidget(
+              title: todoItem.title, fontSize: 14, fontWeight: FontWeight.w500),
           const SizedBox(
             height: 21,
           ),
-          Text(
-            "Descrpiton".toUpperCase(),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onBackground,
-              fontWeight: FontWeight.w700,
+          TextWidget(
+              title: "Descrpiton".toUpperCase(),
               fontSize: 18,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            todoItem.description,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onBackground,
-              fontWeight: FontWeight.w300,
+              fontWeight: FontWeight.w700),
+          TextWidget(
+              title: todoItem.description,
               fontSize: 12,
-            ),
-            textAlign: TextAlign.center,
-          ),
+              fontWeight: FontWeight.w300),
         ],
       ),
     );

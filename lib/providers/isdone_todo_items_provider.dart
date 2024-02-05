@@ -8,6 +8,7 @@ class CheckedTodoItemNotifier extends StateNotifier<List<TodoItem>> {
   }) : super([]);
 
   final Ref ref;
+  List<TodoItem> items = [];
 
   void addCheckedItem(TodoItem item) {
     state = [...state, item];
@@ -27,6 +28,19 @@ class CheckedTodoItemNotifier extends StateNotifier<List<TodoItem>> {
         return removeItem();
       },
     );
+  }
+
+  void removeAllItems() {
+    state = [];
+  }
+
+  void hideList({required bool hide}) {
+    if (hide) {
+      items = state;
+      state = [];
+    } else {
+      state = items;
+    }
   }
 
   void removeItem() {
