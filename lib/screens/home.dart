@@ -5,6 +5,7 @@ import 'package:todo_app/providers/todo_item_provider.dart';
 import 'package:todo_app/widgets/add_item.dart';
 import 'package:todo_app/widgets/alert_dialog.dart';
 import 'package:todo_app/widgets/show_item_details.dart';
+import 'package:todo_app/widgets/show_snackbar.dart';
 import 'package:todo_app/widgets/text_widget1.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -152,7 +153,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       height: 16,
                     ),
                     Text(
-                      "Add more todos!",
+                      "Add some todos!",
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onBackground,
                         fontWeight: FontWeight.bold,
@@ -189,44 +190,127 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         onTap: () => openTodoItemModal(
                           ShowItemDetails(
                               itemIndex: todoItemsLength > index
-                                  ? index
+                                  ? todoItemsLength - index - 1
                                   : index - todoItemsLength - 1,
                               todoScreen: todoItemsLength > index
                                   ? "UncheckedList"
                                   : "CheckedList"),
                         ),
-                        child: Card(
-                          color: Theme.of(context).colorScheme.primary,
-                          child: ListTile(
-                            leading: TextWidget(
-                              title: (indx.toString()),
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                        child: Dismissible(
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.startToEnd) {
+                              if (index < todoItemsLength) {
+                                ref
+                                    .read(todoItemsProvider.notifier)
+                                    .deleteItem(id: todoItem.id);
+                              } else {
+                                ref
+                                    .read(checkedTodoItemProvider.notifier)
+                                    .deleteItem(id: todoItem.id);
+                              }
+                              showSnackBar(
+                                cnt: "${todoItem.title} Deleted from todo.",
+                                context: context,
+                                isDeleted: true,
+                                ref: ref,
+                                index: index,
+                                todoItemsLength: todoItemsLength,
+                                item: todoItem,
+                              );
+                            } else if (direction ==
+                                DismissDirection.endToStart) {
+                              if (index < todoItemsLength) {
+                                todoItem.isDone = true;
+                                ref.read(todoItemsProvider.notifier).isChecked(
+                                    todoItem, true,
+                                    onDissmised: true);
+                              } else {
+                                todoItem.isDone = false;
+                                ref
+                                    .read(checkedTodoItemProvider.notifier)
+                                    .isChecked(todoItem, false,
+                                        onDissmised: true);
+                              }
+                              showSnackBar(
+                                  cnt:
+                                      "${todoItem.title} added to checked list.",
+                                  context: context);
+                            }
+                          },
+                          secondaryBackground: Container(
+                            height: 50,
+                            margin: EdgeInsets.only(top: 10, bottom: 10),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color.fromARGB(255, 0, 90, 3),
+                                  Color.fromARGB(255, 3, 162, 8),
+                                ],
+                              ),
                             ),
-                            title: TextWidget(
-                              title: todoItem.title,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              lineThrough:
-                                  todoItemsLength > index ? false : true,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                index > todoItemsLength
+                                    ? "Restore to todo"
+                                    : "Done",
+                                textAlign: TextAlign.right,
+                              ),
                             ),
-                            trailing: Checkbox(
-                              checkColor: Colors.white,
-                              // fillColor: MaterialStatePropertyAll(Colors.green),
-                              activeColor: Colors.green,
-                              value: todoItem.isDone,
-                              onChanged: (value) {
-                                // todoItem.isDone = value!;
-                                if (index < todoItemsLength) {
-                                  ref
-                                      .read(todoItemsProvider.notifier)
-                                      .isChecked(todoItem, value!);
-                                } else {
-                                  ref
-                                      .read(checkedTodoItemProvider.notifier)
-                                      .isChecked(todoItem, value!);
-                                }
-                              },
+                          ),
+                          background: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color.fromARGB(255, 196, 13, 3),
+                                  Color.fromARGB(255, 129, 10, 2)
+                                ],
+                              ),
+                            ),
+                            margin: EdgeInsets.only(top: 10, bottom: 10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Delete",
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ),
+                          key: ValueKey<String>(todoItem.title),
+                          child: Card(
+                            color: Theme.of(context).colorScheme.primary,
+                            child: ListTile(
+                              leading: TextWidget(
+                                title: (indx.toString()),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              title: TextWidget(
+                                title: todoItem.title,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                lineThrough:
+                                    todoItemsLength > index ? false : true,
+                              ),
+                              trailing: Checkbox(
+                                checkColor: Colors.white,
+                                // fillColor: MaterialStatePropertyAll(Colors.green),
+                                activeColor: Colors.green,
+                                value: todoItem.isDone,
+                                onChanged: (value) {
+                                  // todoItem.isDone = value!;
+                                  if (index < todoItemsLength) {
+                                    ref
+                                        .read(todoItemsProvider.notifier)
+                                        .isChecked(todoItem, value!);
+                                  } else {
+                                    ref
+                                        .read(checkedTodoItemProvider.notifier)
+                                        .isChecked(todoItem, value!);
+                                  }
+                                },
+                              ),
                             ),
                           ),
                         ),
